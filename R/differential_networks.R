@@ -1,13 +1,13 @@
 
-require(igraph)
-require(ggplot2)
-require(data.table)
-require(dplyr)
-require(tidyr)
-require(ComplexHeatmap)
-require(scMultiSim)
-library(glue)
-
+#' Title
+#'
+#' @param node.labels
+#' @param n.grns
+#'
+#' @return
+#' @export
+#'
+#' @examples
 randomly_select_modules<-function(node.labels, n.grns){
   nr.module<-length(unique(node.labels$module.greedy))
   modules<-unique(node.labels$module.greedy)
@@ -20,14 +20,25 @@ randomly_select_modules<-function(node.labels, n.grns){
     groups<-c(groups, modules[(i*step+1):((i+1)*step)])
     label<-c(label, rep(i,step))
   }
-  return(data.table(module=groups, grn=label))
+  return(data.table::data.table(module=groups, grn=label))
 }
 
 
 
+#' Title
+#'
+#' @param g
+#' @param l
+#' @param node.labels
+#' @param nr.dis
+#'
+#' @return
+#' @export
+#'
+#' @examples
 randomly_select_disregulated_node<-function(g, l, node.labels, nr.dis){
   collect<-list()
-  regs<-which(degree(g, mode = 'out')>0)
+  regs<-which(igraph::degree(g, mode = 'out')>0)
   disregulated_regulators<-c()
   for (i in 1:nrow(l)){
     dis<-l[i, module]
@@ -51,6 +62,15 @@ randomly_select_disregulated_node<-function(g, l, node.labels, nr.dis){
 
 
 
+#' Title
+#'
+#' @param net
+#' @param disregulated_regulators
+#'
+#' @return
+#' @export
+#'
+#' @examples
 add_base_effect_to_grn<-function(net, disregulated_regulators){
   net$base.effect<-rnorm(nrow(net), mean = 2.5, sd = 1)
   n.interactions<-nrow(net)
@@ -59,6 +79,16 @@ add_base_effect_to_grn<-function(net, disregulated_regulators){
   return(net)
 }
 
+#' Title
+#'
+#' @param net
+#' @param disregulated_regulators
+#' @param weight_delta
+#'
+#' @return
+#' @export
+#'
+#' @examples
 modify_weight_of_edges<-function(net, disregulated_regulators, weight_delta = 0.5){
   net$grn.effect<-net$base.effect
   for (gg in unique(disregulated_regulators$grn)){
@@ -68,6 +98,16 @@ modify_weight_of_edges<-function(net, disregulated_regulators, weight_delta = 0.
   return(net)
 }
 
+#' Title
+#'
+#' @param net
+#' @param disregulated_regulators
+#' @param weight_delta
+#'
+#' @return
+#' @export
+#'
+#' @examples
 modify_weight_of_other_edges<-function(net, disregulated_regulators, weight_delta = 0.5){
   net$grn.effect<-net$base.effect
   for (gg in unique(disregulated_regulators$grn)){
@@ -77,6 +117,15 @@ modify_weight_of_other_edges<-function(net, disregulated_regulators, weight_delt
   return(net)
 }
 
+#' Title
+#'
+#' @param net
+#' @param disregulated_regulators
+#'
+#' @return
+#' @export
+#'
+#' @examples
 remove_master_tf_effect_from_other_modules<-function(net, disregulated_regulators){
   net$grn.effect<-net$base.effect
   for (gg in unique(disregulated_regulators$grn)){
@@ -86,6 +135,16 @@ remove_master_tf_effect_from_other_modules<-function(net, disregulated_regulator
   return(net)
 }
 
+#' Title
+#'
+#' @param net
+#' @param disregulated_regulators
+#' @param tf_effect
+#'
+#' @return
+#' @export
+#'
+#' @examples
 set_master_tf_effect<-function(net, disregulated_regulators, tf_effect=5){
   net$grn.effect<-net$base.effect
   for (gg in unique(disregulated_regulators$grn)){
@@ -94,7 +153,19 @@ set_master_tf_effect<-function(net, disregulated_regulators, tf_effect=5){
   return(net)
 }
 
-generate_data_from_grn<-function(net, n.cells = 750, seed=11, tree = Phyla1(), noise = FALSE){
+#' Title
+#'
+#' @param net
+#' @param n.cells
+#' @param seed
+#' @param tree
+#' @param noise
+#'
+#' @return
+#' @export
+#'
+#' @examples
+generate_data_from_grn<-function(net, n.cells = 750, seed=11, tree = scMultiSim::Phyla1(), noise = FALSE){
 
   count_list<-list()
   meta_list<-list()
@@ -104,7 +175,7 @@ generate_data_from_grn<-function(net, n.cells = 750, seed=11, tree = Phyla1(), n
     sub.grn<-net[grn == gg]
     sub.grn<-sub.grn[, c('target','source', 'grn.effect')]
 
-    results <- sim_true_counts(list(
+    results <- scMultiSim::sim_true_counts(list(
       # required options
       rand.seed = seed,
       GRN = sub.grn,
@@ -117,7 +188,7 @@ generate_data_from_grn<-function(net, n.cells = 750, seed=11, tree = Phyla1(), n
       unregulated.gene.ratio  = 0.05))
 
     if (noise){
-      add_expr_noise(
+      scMultiSim::add_expr_noise(
         results,
         # options go here
         alpha_mean = 1e4
@@ -139,30 +210,40 @@ generate_data_from_grn<-function(net, n.cells = 750, seed=11, tree = Phyla1(), n
   return(list(counts, meta))
 }
 
+#' Title
+#'
+#' @param counts
+#' @param meta
+#' @param directory
+#'
+#' @return
+#' @export
+#'
+#' @examples
 save_plots<-function(counts, meta, directory){
 
   colors  = viridis::inferno(length(unique(meta$grn)))
   names(colors) = unique(meta$grn)
 
-  pgrn<-plot_tsne(counts, labels = meta$grn)+
-    theme_bw()+
-    theme(legend.position = 'bottom')+
-    ylab('tSNE2')+
-    xlab('tSNE1')+
-    scale_color_manual(values = colors)
+  pgrn<-scMultiSim::plot_tsne(counts, labels = meta$grn)+
+    ggplot2::theme_bw()+
+    ggplot2::theme(legend.position = 'bottom')+
+    ggplot2::ylab('tSNE2')+
+    ggplot2::xlab('tSNE1')+
+    ggplot2::scale_color_manual(values = colors)
 
   pgrn
 
-  ggsave(pgrn, file = file.path(directory, 'tsne_plot.pdf'), height = 15, width = 15, unit = 'cm')
+  ggplot2::ggsave(pgrn, file = file.path(directory, 'tsne_plot.pdf'), height = 15, width = 15, unit = 'cm')
 
-  ha = HeatmapAnnotation(
-    simulation = anno_simple(meta$grn, col=colors),
-    cell = anno_simple(meta$pop),
+  ha = ComplexHeatmap::HeatmapAnnotation(
+    simulation = ComplexHeatmap::anno_simple(meta$grn, col=colors),
+    cell = ComplexHeatmap::anno_simple(meta$pop),
     annotation_name_side = "left"
   )
 
   pdf(file.path(directory, 'expression_heatmap.pdf'))
-  plot(ComplexHeatmap::Heatmap(counts, row_names_gp = gpar(fontsize = 5),
+  plot(ComplexHeatmap::Heatmap(counts, row_names_gp =grid::gpar(fontsize = 5),
                                top_annotation = ha, show_column_names = FALSE ))
   dev.off()
 
@@ -170,6 +251,20 @@ save_plots<-function(counts, meta, directory){
 }
 
 
+#' Title
+#'
+#' @param net.dir
+#' @param gex.dir
+#' @param network.list
+#' @param nr.modules
+#' @param nr.genes.per.module
+#' @param disregulation.type
+#' @param seed
+#'
+#' @return
+#' @export
+#'
+#' @examples
 batch_create_gex_data<-function(net.dir,
                                 gex.dir,
                                 network.list,
@@ -185,11 +280,11 @@ batch_create_gex_data<-function(net.dir,
     node.path <-file.path(net.dir, net.name, 'nodes.tsv')
 
     # read network data
-    net<-fread(net.path, sep = '\t')
-    node.labels <- fread(node.path, sep = '\t')
+    net<-data.table::fread(net.path, sep = '\t')
+    node.labels <- data.table::fread(node.path, sep = '\t')
 
     # create graph
-    g<-graph_from_data_frame(net, directed = TRUE, vertices = NULL)
+    g<-igraph::graph_from_data_frame(net, directed = TRUE, vertices = NULL)
 
     # select modules and genes to be perturbed
     l<-randomly_select_modules(node.labels, nr.modules)
@@ -220,7 +315,7 @@ batch_create_gex_data<-function(net.dir,
     meta<- generated_data[[2]]
 
     # save the data, plots and files in a directory
-    current_experiment_id<- glue("{net.name}_nm_{nr.modules}_gpm_{nr.genes.per.module}_{disregulation.type}_{seed}")
+    current_experiment_id<- glue::glue("{net.name}_nm_{nr.modules}_gpm_{nr.genes.per.module}_{disregulation.type}_{seed}")
     gex.current.dir<-file.path(gex.dir, net.name, current_experiment_id)
     gex.plot<-file.path(gex.current.dir, 'plots')
     dir.create(gex.plot, recursive = TRUE)
@@ -230,19 +325,19 @@ batch_create_gex_data<-function(net.dir,
 
     # save counts and metadata
     gene_names<-rownames(counts)
-    counts<-as.data.table(t(counts))
+    counts<-data.table::as.data.table(t(counts))
     colnames(counts)<-gene_names
-    fwrite(counts, file = file.path(gex.current.dir, 'gex.tsv'), sep = '\t')
-    fwrite(meta, file = file.path(gex.current.dir, 'metadata.tsv'), sep = '\t')
+    data.table::fwrite(counts, file = file.path(gex.current.dir, 'gex.tsv'), sep = '\t')
+    data.table::fwrite(meta, file = file.path(gex.current.dir, 'metadata.tsv'), sep = '\t')
 
     # save network
-    fwrite(net, file = file.path(gex.current.dir, 'net.tsv'), sep = '\t')
+    data.table::fwrite(net, file = file.path(gex.current.dir, 'net.tsv'), sep = '\t')
 
     metadata.list[[current_experiment_id]]<-list(current_experiment_id, net.name, nr.modules, nr.genes.per.module, disregulation.type, seed, gex.plot, file.path(gex.current.dir, 'gex.tsv'), file.path(gex.current.dir, 'metadata.tsv'))
   }
   metadata.list<-rbindlist(metadata.list)
   colnames(metadata.list)<-c('experiment_id', 'base.network.name', 'nr.grns', 'nr.genes.per.grn', 'disregulation.type', 'seed', 'plot.dir', 'gex.file', 'metadata.file')
-  fwrite(metadata.list, file = file.path(gex.dir, 'metadata.tsv'), sep = '\t')
+  data.table::fwrite(metadata.list, file = file.path(gex.dir, 'metadata.tsv'), sep = '\t')
   return(metadata.list)
 }
 
