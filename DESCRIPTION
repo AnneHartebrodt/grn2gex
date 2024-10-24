@@ -1,0 +1,11 @@
+Package: grn2gex
+Title: Generate Differential Networks and Gene Expession data from those Networks
+Version: 0.0.0.9000
+Authors@R: 
+    person("Anne", "Hartebrodt", , "anne.hartebrodt@fau.de", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-9172-3137"))
+Description: This package creates differential gene regulatory networks from an existing structure. The networks are then used to generate differential gene expression data.
+License: GPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
