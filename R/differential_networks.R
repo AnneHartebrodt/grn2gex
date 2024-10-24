@@ -1,10 +1,10 @@
 
-#' Title
+#' Assign modules to be disregulated to each GRN
 #'
-#' @param node.labels
-#' @param n.grns
+#' @param node.labels A table with the name of the nodes and the module they belong to
+#' @param n.grns Number of GRNs/cell populations to produce
 #'
-#' @return
+#' @return A data.table containing modules and the grn they have been assigned to
 #' @export
 #'
 #' @examples
@@ -12,7 +12,6 @@ randomly_select_modules<-function(node.labels, n.grns){
   nr.module<-length(unique(node.labels$module.greedy))
   modules<-unique(node.labels$module.greedy)
   step<-max(1, floor(nr.module/(n.grns+1)))
-  print(step)
   groups<-c()
   label<-c()
   for (i in 0:(n.grns-1)){
@@ -27,12 +26,12 @@ randomly_select_modules<-function(node.labels, n.grns){
 
 #' Title
 #'
-#' @param g
-#' @param l
-#' @param node.labels
-#' @param nr.dis
+#' @param g The graph to which the GRNs should be added
+#' @param l The list of modules to be perturberd
+#' @param node.labels A data table of nodenames and their modules.
+#' @param nr.dis Number of disregulated genes per module (will be rounded down if too many)
 #'
-#' @return
+#' @return A data frame containing the module, which GRN is assigned to to it and the name of the disregulated gene
 #' @export
 #'
 #' @examples
@@ -42,13 +41,9 @@ randomly_select_disregulated_node<-function(g, l, node.labels, nr.dis){
   disregulated_regulators<-c()
   for (i in 1:nrow(l)){
     dis<-l[i, module]
-    print(dis)
-    print(names(regs))
     eligible<-node.labels[node %in% names(regs)& module.greedy==dis]$node
     nr.dis.c<-min(nr.dis, length(eligible))
     nr.dis.c<-max(1, nr.dis.c)
-    print(nr.dis.c)
-    print(eligible)
     dn<-sample(eligible, size = nr.dis.c)
     for (d in dn){
       collect[[paste0(d,i)]]<-c(l[i,], d)
@@ -62,12 +57,13 @@ randomly_select_disregulated_node<-function(g, l, node.labels, nr.dis){
 
 
 
-#' Title
+#' Add a base effect to all edges to the GRN
+#' At the moment this samples from a random Gaussian with mean 2.5 and standard deviation 1
 #'
-#' @param net
-#' @param disregulated_regulators
+#' @param net The network as an edge list
+#' @param disregulated_regulators The data table containing the perturbation information
 #'
-#' @return
+#' @return The network with an additional column base.effect containing the base weights
 #' @export
 #'
 #' @examples
@@ -79,13 +75,18 @@ add_base_effect_to_grn<-function(net, disregulated_regulators){
   return(net)
 }
 
-#' Title
+#' Modifify the weights to induce the differential behaviour for the networks.
+#' This function modifies the weight of the edges in the mapping.
+#' this means one has to be careful when working with more than two grns, because
+#' the effect is only added/substracted to the selected modules
+#' Good for amping up the effect of the TF
 #'
-#' @param net
-#' @param disregulated_regulators
-#' @param weight_delta
+#' @param net The network with source, target and base.effect columns
+#' @param disregulated_regulators The mapping for the disregulated modules
+#' @param weight_delta The effect to be added to the selected edges
 #'
-#' @return
+#' @return net A network with an additional column grn.effect which is a copy of the base effect but modified according
+#' to the network mapping
 #' @export
 #'
 #' @examples
@@ -98,13 +99,15 @@ modify_weight_of_edges<-function(net, disregulated_regulators, weight_delta = 0.
   return(net)
 }
 
-#' Title
+#' Modifies the selected TF in the GRNS which are NOT part of the selected module.
+#' Good for reducing the effect of TFs in all but the selected module
 #'
-#' @param net
-#' @param disregulated_regulators
-#' @param weight_delta
+#' @param net The input network with columns source, target and base.effect
+#' @param disregulated_regulators The mapping with the perturbed regulators
+#' @param weight_delta The weight to be added/substracted
 #'
-#' @return
+#' @return net A network with an additional column grn.effect which is a copy of the base effect but modified according
+#' to the network mapping
 #' @export
 #'
 #' @examples
@@ -117,12 +120,14 @@ modify_weight_of_other_edges<-function(net, disregulated_regulators, weight_delt
   return(net)
 }
 
-#' Title
+#' Set the effect of the Master TFs down for all modules expect the one where it is supposed to be
+#' active.
 #'
-#' @param net
-#' @param disregulated_regulators
+#' @param net The input network with columns source, target and base.effect
+#' @param disregulated_regulators The mapping with the perturbed regulators
 #'
-#' @return
+#' @return net A network with an additional column grn.effect which is a copy of the base effect but modified according
+#' to the network mapping
 #' @export
 #'
 #' @examples
@@ -135,13 +140,14 @@ remove_master_tf_effect_from_other_modules<-function(net, disregulated_regulator
   return(net)
 }
 
-#' Title
+#' Set the effect of the TFs to a specific value according to their effect.
 #'
-#' @param net
-#' @param disregulated_regulators
-#' @param tf_effect
+#' @param net The input network with columns source, target and base.effect
+#' @param disregulated_regulators The mapping with the perturbed regulators
+#' @param tf_effect The weight to set the edges to
 #'
-#' @return
+#' @return net A network with an additional column grn.effect which is a copy of the base effect but modified according
+#' to the network mapping
 #' @export
 #'
 #' @examples
@@ -153,15 +159,15 @@ set_master_tf_effect<-function(net, disregulated_regulators, tf_effect=5){
   return(net)
 }
 
-#' Title
+#' Use scMultiSim to generate the data with the master network
 #'
 #' @param net
-#' @param n.cells
-#' @param seed
-#' @param tree
-#' @param noise
+#' @param n.cells Number of cells per GRN
+#' @param seed Random seet
+#' @param tree Differentiation tree required for scMultisim (please refer to documentation)
+#' @param noise Whether to add typical noise to the count data
 #'
-#' @return
+#' @return List of two elements: count matrix, and associated metadata as a data.table
 #' @export
 #'
 #' @examples
@@ -210,11 +216,11 @@ generate_data_from_grn<-function(net, n.cells = 750, seed=11, tree = scMultiSim:
   return(list(counts, meta))
 }
 
-#' Title
+#' Save diagnostic plots with the data
 #'
-#' @param counts
-#' @param meta
-#' @param directory
+#' @param counts count matrix!! (not data.table)
+#' @param meta metadata data.table
+#' @param directory directory where to save the plots to
 #'
 #' @return
 #' @export
@@ -251,7 +257,7 @@ save_plots<-function(counts, meta, directory){
 }
 
 
-#' Title
+#' Generate data for a list of pregenerated networks.
 #'
 #' @param net.dir
 #' @param gex.dir
