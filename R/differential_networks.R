@@ -152,6 +152,8 @@ remove_master_tf_effect_from_other_modules<-function(net, disregulated_regulator
 #'
 #' @examples
 set_master_tf_effect<-function(net, disregulated_regulators, tf_effect=5){
+  if(!('base.effect' %in% colnames(net))) BBmisc::stopf('net does not have a column "base effect", please initialize first')
+
   net$grn.effect<-net$base.effect
   for (gg in unique(disregulated_regulators$grn)){
     net[(grn == gg) & (source %in% disregulated_regulators[grn==gg]$disregulated_gene),]$grn.effect<-tf_effect
@@ -159,11 +161,11 @@ set_master_tf_effect<-function(net, disregulated_regulators, tf_effect=5){
   return(net)
 }
 
-#' Use scMultiSim to generate the data with the master network
+#' Use scMultiSim to generate the data with the modified network
 #'
 #' @param net
 #' @param n.cells Number of cells per GRN
-#' @param seed Random seet
+#' @param seed Random seed
 #' @param tree Differentiation tree required for scMultisim (please refer to documentation)
 #' @param noise Whether to add typical noise to the count data
 #'
@@ -172,6 +174,12 @@ set_master_tf_effect<-function(net, disregulated_regulators, tf_effect=5){
 #'
 #' @examples
 generate_data_from_grn<-function(net, n.cells = 750, seed=11, tree = scMultiSim::Phyla1(), noise = FALSE){
+
+  if(!('source' %in% colnames(net))) BBmisc::stopf("Column 'source' does not exist in dataframe")
+  if(!('target' %in% colnames(net))) BBmisc::stopf("Column 'target' does not exist in dataframe")
+  if(!('grn.effect' %in% colnames(net))) BBmisc::stopf("Column 'grn.effect' does not exist in dataframe, please initialize run 'add_base_effect_to_grn' firs, or initialize weights otherwise")
+  if(!('grn' %in% colnames(net))) BBmisc::stopf('GRN colum is not contained in dataframe')
+  if (nrow(net)==0) BBmisc::stopf('GRN data frame is empty')
 
   count_list<-list()
   meta_list<-list()
