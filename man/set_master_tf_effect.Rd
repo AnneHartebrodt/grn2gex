@@ -2,13 +2,21 @@
 % Please edit documentation in R/differential_networks.R
 \name{set_master_tf_effect}
 \alias{set_master_tf_effect}
-\title{Title}
+\title{Set the effect of the TFs to a specific value according to their effect.}
 \usage{
 set_master_tf_effect(net, disregulated_regulators, tf_effect = 5)
 }
 \arguments{
-\item{tf_effect}{}
+\item{net}{The input network with columns source, target and base_effect}
+
+\item{disregulated_regulators}{The mapping with the perturbed regulators}
+
+\item{tf_effect}{The weight to set the edges to}
+}
+\value{
+net A network with an additional column grn_effect which is a copy of the base effect but modified according
+to the network mapping
 }
 \description{
-Title
+Set the effect of the TFs to a specific value according to their effect.
 }

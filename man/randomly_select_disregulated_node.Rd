@@ -4,10 +4,19 @@
 \alias{randomly_select_disregulated_node}
 \title{Title}
 \usage{
-randomly_select_disregulated_node(g, l, node.labels, nr.dis)
+randomly_select_disregulated_node(g, l, node_labels, nr_disregulated_genes)
 }
 \arguments{
-\item{nr.dis}{}
+\item{g}{The graph to which the GRNs should be added}
+
+\item{l}{The list of modules to be perturberd}
+
+\item{node_labels}{A data table of nodenames and their modules.}
+
+\item{nr_disregulated_genes}{Number of disregulated genes per module (will be rounded down if too many)}
+}
+\value{
+A data frame containing the module, which GRN is assigned to to it and the name of the disregulated gene
 }
 \description{
 Title

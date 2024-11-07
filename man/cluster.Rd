@@ -4,14 +4,14 @@
 \alias{cluster}
 \title{Recursively cluster and save the modules}
 \usage{
-cluster(gr, network.dir, orig.graph)
+cluster(gr, min_nodes = 50, max_nodes = 200)
 }
 \arguments{
 \item{gr}{Current subgraph}
 
-\item{network.dir}{Output dir (trailed along)}
+\item{network_dir}{Output dir (trailed along)}
 
-\item{orig.graph}{Original graph (trailed along)}
+\item{orig_graph}{Original graph (trailed along)}
 }
 \description{
 Recursively cluster and save the modules

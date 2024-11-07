@@ -2,16 +2,25 @@
 % Please edit documentation in R/create_modules.R
 \name{remove_irrelevant_networks}
 \alias{remove_irrelevant_networks}
-\title{Remove networks which contain only one or 2 hubnodes}
+\title{Remove networks which contain only one or two hubnodes}
 \usage{
-remove_irrelevant_networks(basedir)
+remove_irrelevant_networks(graph_list)
 }
 \arguments{
-\item{basedir}{Directory containing network files with the ending ".edges.tsv"}
+\item{graph_list}{A list of igraph objects}
 }
 \value{
-edgelist: A list of files relative to the basedir containing networks with more than 1 hubnode
+List of igraph objects containing networks with more than 2 hubnodes
 }
 \description{
-Remove networks which contain only one or 2 hubnodes
+Networks which contain only one or two hubnodes and no structure otherwise may
+not be of interest and can be removed with this function.
+}
+\examples{
+collectri_file <- '/tmp/collectri.tsv'
+collectri <- loadOrDownloadCollectTRI(collectri_file)
+colnames(collectri)<- c('source', 'target', 'sad')
+netlist<-clusterNetwork(collectri )
+netlist<-remove_irrelevant_networks(netlist)
+
 }

@@ -2,13 +2,18 @@
 % Please edit documentation in R/differential_networks.R
 \name{randomly_select_modules}
 \alias{randomly_select_modules}
-\title{Title}
+\title{Assign modules to be disregulated to each GRN}
 \usage{
-randomly_select_modules(node.labels, n.grns)
+randomly_select_modules(node_labels, n_grns)
 }
 \arguments{
-\item{n.grns}{}
+\item{node_labels}{A table with the name of the nodes and the module they belong to}
+
+\item{n_grns}{Number of GRNs/cell populations to produce}
+}
+\value{
+A data.table containing modules and the grn they have been assigned to
 }
 \description{
-Title
+Assign modules to be disregulated to each GRN
 }

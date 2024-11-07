@@ -2,13 +2,21 @@
 % Please edit documentation in R/differential_networks.R
 \name{remove_master_tf_effect_from_other_modules}
 \alias{remove_master_tf_effect_from_other_modules}
-\title{Title}
+\title{Set the effect of the Master TFs down for all modules expect the one where it is supposed to be
+active.}
 \usage{
 remove_master_tf_effect_from_other_modules(net, disregulated_regulators)
 }
 \arguments{
-\item{disregulated_regulators}{}
+\item{net}{The input network with columns source, target and base_effect}
+
+\item{disregulated_regulators}{The mapping with the perturbed regulators}
+}
+\value{
+net A network with an additional column grn_effect which is a copy of the base effect but modified according
+to the network mapping
 }
 \description{
-Title
+Set the effect of the Master TFs down for all modules expect the one where it is supposed to be
+active.
 }

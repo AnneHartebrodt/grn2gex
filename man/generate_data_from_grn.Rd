@@ -2,19 +2,28 @@
 % Please edit documentation in R/differential_networks.R
 \name{generate_data_from_grn}
 \alias{generate_data_from_grn}
-\title{Title}
+\title{Use scMultiSim to generate the data with the modified network}
 \usage{
 generate_data_from_grn(
   net,
-  n.cells = 750,
+  n_cells = 750,
   seed = 11,
-  tree = Phyla1(),
+  tree = scMultiSim::Phyla1(),
   noise = FALSE
 )
 }
 \arguments{
-\item{noise}{}
+\item{n_cells}{Number of cells per GRN}
+
+\item{seed}{Random seed}
+
+\item{tree}{Differentiation tree required for scMultisim (please refer to documentation)}
+
+\item{noise}{Whether to add typical noise to the count data}
+}
+\value{
+List of two elements: count matrix, and associated metadata as a data.table
 }
 \description{
-Title
+Use scMultiSim to generate the data with the modified network
 }
