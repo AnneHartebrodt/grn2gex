@@ -13,17 +13,22 @@ URL: https://github.com/AnneHartebrodt/grn2gex
 BugReports: https://github.com/AnneHartebrodt/grn2gex/issues
 Imports: 
     BBmisc,
-    ComplexHeatmap,
     data.table,
-    decoupleR,
     dplyr,
     ggplot2,
     glue,
     grDevices,
     grid,
     igraph,
-    OmnipathR,
-    scMultiSim,
+    OmnipathR (>= 3.12.4),
     stats,
     tidyr,
-    viridis
+    viridis,
+    ComplexHeatmap (>= 2.20.0),
+    decoupleR (>= 2.10.0),
+    scMultiSim (>= 1.2.0)
+Remotes:  
+    saezlab/decoupleR,
+    jokergoo/ComplexHeatmap,
+    ZhangLabGT/scMultiSim,
+    saezlab/OmnipathR
