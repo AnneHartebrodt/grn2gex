@@ -31,6 +31,7 @@ save_generated_data<-function(net, counts, meta, info, gex_dir){
   # save network
   data.table::fwrite(net, file = file.path(gex.current.dir, 'net.tsv'), sep = '\t')
 
+  return (gex.current.dir)
 }
 
 
@@ -72,10 +73,6 @@ save_small_subgraph<-function(sub, network_dir, orig_graph){
   file.node<-file.path(local.dir, paste0('nodes.tsv'))
 
   res<-restore_original_directionality(sub, orig_graph)
-  sub<-res[[1]]
-  go<-res[[2]]
-  nodelist<-res[[3]]
-  egdelist<-res[[4]]
 
   # Layout and create submodules
   lay <- igraph::layout_with_kk(sub)
