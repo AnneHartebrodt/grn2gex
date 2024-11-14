@@ -14,8 +14,8 @@
 #' @examples
 save_generated_data<-function(net, counts, meta, info, gex_dir){
   # save the data, plots and files in a directory
-  gex.current.dir<-file.path(gex_dir, info[[2]], info[[1]])
-  gex.plot<-file.path(gex.current.dir, 'plots')
+  #gex.current.dir<-file.path(gex_dir, info[[2]], info[[1]])
+  gex.plot<-file.path(gex_dir, 'plots')
   dir.create(gex.plot, recursive = TRUE)
 
   # save plots before transforming data into data.table
@@ -26,12 +26,12 @@ save_generated_data<-function(net, counts, meta, info, gex_dir){
   counts<-data.table::as.data.table(t(counts))
   colnames(counts)<-gene_names
 
-  data.table::fwrite(counts, file = file.path(gex.current.dir, 'gex.tsv'), sep = '\t')
-  data.table::fwrite(meta, file = file.path(gex.current.dir, 'metadata.tsv'), sep = '\t')
+  data.table::fwrite(counts, file = file.path(gex_dir, 'gex.tsv'), sep = '\t')
+  data.table::fwrite(meta, file = file.path(gex_dir, 'metadata.tsv'), sep = '\t')
   # save network
-  data.table::fwrite(net, file = file.path(gex.current.dir, 'net.tsv'), sep = '\t')
+  data.table::fwrite(net, file = file.path(gex_dir, 'net.tsv'), sep = '\t')
 
-  return (gex.current.dir)
+  return (gex_dir)
 }
 
 
