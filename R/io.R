@@ -12,9 +12,8 @@
 #' @export
 #'
 #' @examples
-save_generated_data<-function(net, counts, meta, info, gex_dir){
+save_generated_data<-function(net, counts, meta, gex_dir){
   # save the data, plots and files in a directory
-  #gex.current.dir<-file.path(gex_dir, info[[2]], info[[1]])
   gex.plot<-file.path(gex_dir, 'plots')
   dir.create(gex.plot, recursive = TRUE)
 

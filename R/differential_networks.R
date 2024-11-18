@@ -190,6 +190,7 @@ generate_data_from_grn<-function(net, n_cells = 750, seed=11, tree = scMultiSim:
     sub.grn<-net[grn == gg]
     sub.grn<-sub.grn[, c('target','source', 'grn_effect')]
 
+    set.seed(seed)
     results <- scMultiSim::sim_true_counts(list(
       # required options
       rand.seed = seed,
