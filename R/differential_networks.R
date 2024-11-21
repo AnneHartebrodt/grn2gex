@@ -132,11 +132,11 @@ modify_weight_of_other_edges<-function(net, disregulated_regulators, weight_delt
 #'
 #' @examples
 remove_master_tf_effect_from_other_modules<-function(net, disregulated_regulators){
-
+  print('mAster effect')
   net$grn_effect<-net$base_effect
   for (gg in unique(disregulated_regulators$grn)){
     print(gg)
-    net[(grn != gg) & (source %in% disregulated_regulators[grn!=gg]$disregulated_gene),]$grn_effect<-0.01
+    net[(grn != gg) & (source %in% disregulated_regulators[grn==gg]$disregulated_gene),]$grn_effect<-0.01
   }
   return(net)
 }
@@ -186,10 +186,12 @@ generate_data_from_grn<-function(net, n_cells = 750, seed=11, tree = scMultiSim:
   meta_list<-list()
 
   for (gg in unique(net$grn)){
+    print(gg)
     # Subset grn and reorder
     sub.grn<-net[grn == gg]
     sub.grn<-sub.grn[, c('target','source', 'grn_effect')]
 
+    print(sub.grn)
     set.seed(seed)
     results <- scMultiSim::sim_true_counts(list(
       # required options
@@ -275,6 +277,7 @@ create_gex_data<-function(net,
   l<-randomly_select_modules(node_labels, nr_modules)
   disregulated_regulators<-randomly_select_disregulated_node(g, l,node_labels, nr_genes_per_module)
 
+  print(disregulated_regulators)
   if (base_effect == 'standard-normal'){
     # Add gaussian weights as a base
     net<-add_base_effect_gaussian(net, disregulated_regulators, mean=mean, sd = sd)
