@@ -304,7 +304,7 @@ randomly_select_disregulated_node<-function(g, l, node_labels, nr_disregulated_g
   disregulated_regulators<-c()
   for (i in 1:nrow(l)){
     dis<-l[i, module]
-    eligible<-node_labels[node %in% names(regs)& module_greedy==dis & node %in% duplicate_nodes]$node
+    eligible<-node_labels[node %in% names(regs)& module_greedy==dis]$node
     nr_disregulated_genes_c<-min(nr_disregulated_genes, length(eligible))
     nr_disregulated_genes_c<-max(1, nr_disregulated_genes_c)
     dn<-sample(eligible, size = nr_disregulated_genes_c)
