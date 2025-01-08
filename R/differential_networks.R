@@ -300,11 +300,10 @@ randomly_select_modules<-function(node_labels, n_grns, nr_modules){
 #' @examples
 randomly_select_disregulated_node<-function(g, l, node_labels, nr_disregulated_genes){
   collect<-list()
-  regs<-which(igraph::degree(g, mode = 'out')>0)
+  regs<-which(igraph::degree(g, mode = 'out')>1)
   disregulated_regulators<-c()
   for (i in 1:nrow(l)){
     dis<-l[i, module]
-    duplicate_nodes<-unique(res$egdelist$source[duplicated(res$egdelist$source)])
     eligible<-node_labels[node %in% names(regs)& module_greedy==dis & node %in% duplicate_nodes]$node
     nr_disregulated_genes_c<-min(nr_disregulated_genes, length(eligible))
     nr_disregulated_genes_c<-max(1, nr_disregulated_genes_c)
