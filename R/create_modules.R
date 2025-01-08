@@ -39,12 +39,15 @@ cluster<-function(gr, min_nodes=50, max_nodes= 200){
   group_sizes<-table(groups$membership)
   list_of_nets<-list()
 
+  print(min_nodes)
+  print(max_nodes)
+
   for (cl in names(group_sizes)){
     gs <- group_sizes[cl]
     sub<-igraph::subgraph(gr, which(groups$membership==cl))
     if (gs>max_nodes){
 
-      list_of_nets<-c(list_of_nets, cluster(sub))
+      list_of_nets<-c(list_of_nets, cluster(sub, min_nodes = min_nodes, max_nodes = max_nodes))
     }
     else if (gs<max_nodes & gs>min_nodes){
       list_of_nets<-c(list_of_nets, list(sub))
@@ -93,10 +96,10 @@ loadOrDownloadCollectTRI<-function(collectri_file, organism = 'human'){
 #' collectri <- loadOrDownloadCollectTRI(collectri.file)
 #' colnames(collectri)<- c('source', 'target', 'sad')
 #' netlist<-clusterNetwork(collectri )
-clusterNetwork<-function(network_dt){
+clusterNetwork<-function(network_dt, min_nodes=50, max_nodes= 200){
   g<-createGraph(network_dt, directed = FALSE)
   # call recursive clustering function.
-  return(cluster(g))
+  return(cluster(g, min_nodes, max_nodes))
 }
 
 #' Create Graph from data.table.

@@ -1,62 +1,3 @@
-
-#' Assign modules to be disregulated to each GRN
-#'
-#' @param node_labels A table with the name of the nodes and the module they belong to
-#' @param n_grns Number of GRNs/cell populations to produce
-#'
-#' @return A data.table containing modules and the grn they have been assigned to
-#' @export
-#'
-#' @examples
-randomly_select_modules<-function(node_labels, n_grns){
-  nr.module<-length(unique(node_labels$module_greedy))
-  modules<-unique(node_labels$module_greedy)
-  step<-max(1, floor(nr.module/(n_grns+1)))
-  groups<-c()
-  label<-c()
-  for (i in 0:(n_grns-1)){
-    print((i*step+1))
-    groups<-c(groups, modules[(i*step+1):((i+1)*step)])
-    label<-c(label, rep(i,step))
-  }
-  return(data.table::data.table(module=groups, grn=label))
-}
-
-
-
-#' Title
-#'
-#' @param g The graph to which the GRNs should be added
-#' @param l The list of modules to be perturberd
-#' @param node_labels A data table of nodenames and their modules.
-#' @param nr_disregulated_genes Number of disregulated genes per module (will be rounded down if too many)
-#'
-#' @return A data frame containing the module, which GRN is assigned to to it and the name of the disregulated gene
-#' @export
-#'
-#' @examples
-randomly_select_disregulated_node<-function(g, l, node_labels, nr_disregulated_genes){
-  collect<-list()
-  regs<-which(igraph::degree(g, mode = 'out')>0)
-  disregulated_regulators<-c()
-  for (i in 1:nrow(l)){
-    dis<-l[i, module]
-    eligible<-node_labels[node %in% names(regs)& module_greedy==dis]$node
-    nr_disregulated_genes_c<-min(nr_disregulated_genes, length(eligible))
-    nr_disregulated_genes_c<-max(1, nr_disregulated_genes_c)
-    dn<-sample(eligible, size = nr_disregulated_genes_c)
-    for (d in dn){
-      collect[[paste0(d,i)]]<-c(l[i,], d)
-    }
-  }
-  collect<-data.table::rbindlist(collect)
-  colnames(collect)<-c('module', 'grn', 'disregulated_gene')
-  return(collect)
-
-}
-
-
-
 #' Add a base effect to all edges to the GRN
 #' At the moment this samples from a random Gaussian with mean 2.5 and standard deviation 1
 #'
@@ -132,10 +73,8 @@ modify_weight_of_other_edges<-function(net, disregulated_regulators, weight_delt
 #'
 #' @examples
 remove_master_tf_effect_from_other_modules<-function(net, disregulated_regulators){
-  print('mAster effect')
   net$grn_effect<-net$base_effect
   for (gg in unique(disregulated_regulators$grn)){
-    print(gg)
     net[(grn != gg) & (source %in% disregulated_regulators[grn==gg]$disregulated_gene),]$grn_effect<-0.01
   }
   return(net)
@@ -186,12 +125,10 @@ generate_data_from_grn<-function(net, n_cells = 750, seed=11, tree = scMultiSim:
   meta_list<-list()
 
   for (gg in unique(net$grn)){
-    print(gg)
     # Subset grn and reorder
     sub.grn<-net[grn == gg]
     sub.grn<-sub.grn[, c('target','source', 'grn_effect')]
 
-    print(sub.grn)
     set.seed(seed)
     results <- scMultiSim::sim_true_counts(list(
       # required options
@@ -251,8 +188,9 @@ generate_data_from_grn<-function(net, n_cells = 750, seed=11, tree = scMultiSim:
 create_gex_data<-function(net,
                           node_labels,
                           net_name,
-                          nr_modules = 2,
-                          nr_genes_per_module = 2,
+                          nr_grns = 2,
+                          nr_modules = 1,
+                          nr_genes_per_module = 1,
                           base_effect = 'standard-normal',
                           mean = 2.5,
                           sd = 1.0,
@@ -274,7 +212,7 @@ create_gex_data<-function(net,
   g<-igraph::graph_from_data_frame(net, directed = TRUE, vertices = NULL)
 
   # select modules and genes to be perturbed
-  l<-randomly_select_modules(node_labels, nr_modules)
+  l<-randomly_select_modules(node_labels, nr_grns, nr_modules)
   disregulated_regulators<-randomly_select_disregulated_node(g, l,node_labels, nr_genes_per_module)
 
   print(disregulated_regulators)
@@ -289,12 +227,16 @@ create_gex_data<-function(net,
   # Set effects of selected regulators t 0
   if (disregulation_type ==  'remove-tf-effect-others'){
     net<-remove_master_tf_effect_from_other_modules(net, disregulated_regulators)
+    disregulated_regulators$effect<-disregulation_type
   }else if (disregulation_type ==  'set-tf-value'){
     net<-set_master_tf_effect(net, disregulated_regulators, tf_effect = tf_effect )
+    disregulated_regulators$effect<-paste0(disregulation_type, '_', tf_effect)
   } else if (disregulation_type == 'adjust-weight-of-tf'){
     net<- modify_weight_of_edges(net, disregulated_regulators , weight_delta = weight_delta)
+    disregulated_regulators$effect<-paste0(disregulation_type, '_', weight_delta)
   }else if(disregulation_type == 'adjust-weight-of-others'){
     net<- modify_weight_of_other_edges(net, disregulated_regulators , weight_delta = weight_delta)
+    disregulated_regulators$effect<-paste0(disregulation_type, '_', weight_delta)
   }
   else
   {
@@ -310,10 +252,70 @@ create_gex_data<-function(net,
 
   info<-list(current_experiment_id, net_name, nr_modules, nr_genes_per_module, disregulation_type, seed)
 
-  results<- list(net, counts, meta, info)
-  names(results)<-c('net', 'counts', 'meta', 'info')
+  results<- list(net, counts, meta, info, disregulated_regulators)
+  names(results)<-c('net', 'counts', 'meta', 'info', 'disregulated_regulators')
   return(results)
 }
 
 
+#' Assign modules to be disregulated to each GRN
+#'
+#' @param node_labels A table with the name of the nodes and the module they belong to
+#' @param n_grns Number of GRNs/cell populations to produce
+#'
+#' @return A data.table containing modules and the grn they have been assigned to
+#' @export
+#'
+#' @examples
+randomly_select_modules<-function(node_labels, n_grns, nr_modules){
+  # Total number of modules
+  nr.module<-length(unique(node_labels$module_greedy))
+  # unique module names
+  modules<-unique(node_labels$module_greedy)
+  max_modules_per_grn <- max(1, floor(nr.module/(n_grns+1)))
+  step<-min(max_modules_per_grn, nr_modules)
+  print(step)
+  groups<-c()
+  label<-c()
+  for (i in 0:(n_grns-1)){
+    print((i*step+1))
+    groups<-c(groups, modules[(i*step+1):((i+1)*step)])
+    label<-c(label, rep(i,step))
+  }
+  return(data.table::data.table(module=groups, grn=label))
+}
+
+
+
+#' Title
+#'
+#' @param g The graph to which the GRNs should be added
+#' @param l The list of modules to be perturberd
+#' @param node_labels A data table of nodenames and their modules.
+#' @param nr_disregulated_genes Number of disregulated genes per module (will be rounded down if too many)
+#'
+#' @return A data frame containing the module, which GRN is assigned to to it and the name of the disregulated gene
+#' @export
+#'
+#' @examples
+randomly_select_disregulated_node<-function(g, l, node_labels, nr_disregulated_genes){
+  collect<-list()
+  regs<-which(igraph::degree(g, mode = 'out')>0)
+  disregulated_regulators<-c()
+  for (i in 1:nrow(l)){
+    dis<-l[i, module]
+    duplicate_nodes<-unique(res$egdelist$source[duplicated(res$egdelist$source)])
+    eligible<-node_labels[node %in% names(regs)& module_greedy==dis & node %in% duplicate_nodes]$node
+    nr_disregulated_genes_c<-min(nr_disregulated_genes, length(eligible))
+    nr_disregulated_genes_c<-max(1, nr_disregulated_genes_c)
+    dn<-sample(eligible, size = nr_disregulated_genes_c)
+    for (d in dn){
+      collect[[paste0(d,i)]]<-c(l[i,], d)
+    }
+  }
+  collect<-data.table::rbindlist(collect)
+  colnames(collect)<-c('module', 'grn', 'disregulated_gene')
+  return(collect)
+
+}
 
