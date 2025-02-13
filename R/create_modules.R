@@ -14,6 +14,7 @@ restore_original_directionality<-function(sub, orig_graph){
 
   go<- igraph::cluster_fast_greedy(sub)
   sub<-igraph::subgraph(orig_graph, igraph::V(sub)$name)
+  sub<-igraph::simplify(sub, remove.loops = TRUE)
   edgelist<-data.table::as.data.table(igraph::as_edgelist(sub) )
   colnames(edgelist)<-c('source', 'target')
   nodelist<-data.table::data.table(node=go$names, module_greedy=go$membership)
