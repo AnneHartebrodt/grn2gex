@@ -12,7 +12,7 @@
 #' @export
 #'
 #' @examples
-save_generated_data<-function(net, counts, meta, gex_dir, disregulated_info){
+save_generated_data<-function(net, counts, meta, gex_dir, disregulated_info=NULL){
   # save the data, plots and files in a directory
   gex.plot<-file.path(gex_dir, 'plots')
   dir.create(gex.plot, recursive = TRUE)
@@ -29,7 +29,9 @@ save_generated_data<-function(net, counts, meta, gex_dir, disregulated_info){
   data.table::fwrite(meta, file = file.path(gex_dir, 'metadata.tsv'), sep = '\t')
   # save network
   data.table::fwrite(net, file = file.path(gex_dir, 'net.tsv'), sep = '\t')
-  data.table::fwrite(disregulated_info, file = file.path(gex_dir, 'disregulation_info.tsv'), sep = '\t' )
+  if (!is.null(disregulated_info)){
+    data.table::fwrite(disregulated_info, file = file.path(gex_dir, 'disregulation_info.tsv'), sep = '\t' )
+  }
   return (gex_dir)
 }
 

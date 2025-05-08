@@ -4,7 +4,7 @@
 \alias{save_generated_data}
 \title{Save everything to a specified location}
 \usage{
-save_generated_data(net, counts, meta, gex_dir, disregulated_info)
+save_generated_data(net, counts, meta, gex_dir, disregulated_info = NULL)
 }
 \arguments{
 \item{seed}{}
