@@ -4,7 +4,7 @@
 \alias{randomly_select_modules}
 \title{Assign modules to be disregulated to each GRN}
 \usage{
-randomly_select_modules(node_labels, n_grns)
+randomly_select_modules(node_labels, n_grns, nr_modules)
 }
 \arguments{
 \item{node_labels}{A table with the name of the nodes and the module they belong to}

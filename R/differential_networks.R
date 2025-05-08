@@ -208,6 +208,10 @@ create_gex_data<-function(net,
     BBmisc::stopf('Invalid differential effect name')
   }
 
+  if (length(unique(node_labels$module_greedy))<nr_grns){
+    BBmisc::stopf('Number of unique modules smaller that number of requested GRNs.')
+  }
+
   # create graph
   g<-igraph::graph_from_data_frame(net, directed = TRUE, vertices = NULL)
 
@@ -257,6 +261,80 @@ create_gex_data<-function(net,
   return(results)
 }
 
+#' Generate data for a list of pregenerated networks.
+#'
+#' @param net
+#' @param common_net
+#' @param net_name
+#'
+#' @return
+#' @export
+#'
+#' @examples
+create_gex_data_easy<-function(net,
+                               common_net,
+                               net_name,
+                               base_effect = 'standard-normal',
+                               mean = 2.5,
+                               sd = 1.0,
+                               seed=11){
+
+
+
+
+  if (!('module' %in% colnames(net))){
+    BBmisc::stopf('net does not conain module column')
+  }
+
+  netlist<-list()
+  k = 1
+  print(net$module)
+  number_grns <-length(unique(net$module))
+
+  common_net$effect<-rnorm(nrow(common_net), mean = mean, sd = sd)
+
+  for (i in unique(net$module)){
+    print(i)
+    subnet_list <-list()
+    subnet <-net[module == i]
+    subnet$effect<-rnorm(nrow(subnet), mean = mean, sd = sd)
+    netlist[[k]] <-subnet
+    k<-k+1
+    for (j in unique(net$module)){
+      if (j!=i){
+        print(j)
+        subnet$module <-j
+        subnet$effect<-0.01
+        netlist[[k]]<-subnet
+        k<-k+1
+      }
+
+    }
+    common_copy<-common_net
+
+    common_copy$module<-i
+    common_copy<-common_copy[, .(source, target, module, effect)]
+    netlist[[k]]<-common_copy
+    k<-k+1
+
+  }
+  print(netlist)
+  net<-rbindlist(netlist)
+  print(net)
+  colnames(net)<-c('source', 'target', 'grn', 'grn_effect')
+  # Generate data
+  generated_data <- generate_data_from_grn(net, seed = seed, n_cells = 500)
+
+  counts <- generated_data[[1]]
+  meta<- generated_data[[2]]
+  current_experiment_id<- glue::glue("{net_name}_{seed}")
+
+  info<-list(current_experiment_id, net_name, seed)
+
+  results<- list(net, counts, meta, info)
+  names(results)<-c('net', 'counts', 'meta', 'info')
+  return(results)
+}
 
 #' Assign modules to be disregulated to each GRN
 #'

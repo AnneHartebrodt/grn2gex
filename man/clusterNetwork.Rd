@@ -4,7 +4,7 @@
 \alias{clusterNetwork}
 \title{Wrapper function to cluster a network in a datatable.}
 \usage{
-clusterNetwork(network_dt)
+clusterNetwork(network_dt, min_nodes = 50, max_nodes = 200)
 }
 \arguments{
 \item{network_dt}{A data.table containing a colum 'source' and 'target' as the first and second column}
