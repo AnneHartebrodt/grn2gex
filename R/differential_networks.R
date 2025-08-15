@@ -138,7 +138,7 @@ generate_data_from_grn<-function(net, n_cells = 750, seed=11, tree = scMultiSim:
       num.cells = n_cells,
       # optional options
       num.cif = 50,
-      discrete.cif = TRUE,
+      discrete.cif = FALSE, # Setting this to true will produce random data
       cif.sigma = 0.1,
       unregulated.gene.ratio  = 0.05))
 
