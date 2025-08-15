@@ -1,0 +1,18 @@
+data_simulation:
+  edgelist: 
+    - edges1.tsv
+    - edges2.tsv
+  nodelist: 
+    - nodes1.tsv
+    - nodes2.tsv
+  common_edges: 
+    - common_edges1.tsv
+  common_nodes:
+    - common_nodes1.tsv
+  n_cells: 1000
+  n_celltypes: 2
+  seed: 11
+  base_effect: standard-normal
+  mean: 2.5
+  sd: 1
+  dataset_id: 'test'
