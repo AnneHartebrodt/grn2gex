@@ -277,7 +277,8 @@ create_gex_data_easy<-function(net,
                                base_effect = 'standard-normal',
                                mean = 2.5,
                                sd = 1.0,
-                               seed=11){
+                               seed=11,
+                               noise=FALSE){
 
 
 
@@ -323,7 +324,7 @@ create_gex_data_easy<-function(net,
   print(net)
   colnames(net)<-c('source', 'target', 'grn', 'grn_effect')
   # Generate data
-  generated_data <- generate_data_from_grn(net, seed = seed, n_cells = 500)
+  generated_data <- generate_data_from_grn(net, seed = seed, n_cells = 500, noise=noise)
 
   counts <- generated_data[[1]]
   meta<- generated_data[[2]]
