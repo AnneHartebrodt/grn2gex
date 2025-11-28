@@ -11,7 +11,8 @@ create_gex_data_easy(
   base_effect = "standard-normal",
   mean = 2.5,
   sd = 1,
-  seed = 11
+  seed = 11,
+  noise = FALSE
 )
 }
 \arguments{

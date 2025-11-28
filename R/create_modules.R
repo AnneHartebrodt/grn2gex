@@ -72,6 +72,9 @@ loadOrDownloadCollectTRI<-function(collectri_file, organism = 'human'){
   # Main function to cluster collectri network.
   # Check if collectri is stored on disk
   # otherwise download from web
+  options(omnipathr.curl_verbose = TRUE)
+  OmnipathR::omnipath_set_cachedir(tempdir())
+
   if (!file.exists(collectri_file)){
     # get network
     collectri <- decoupleR::get_collectri(organism=organism, split_complexes=FALSE)
@@ -165,4 +168,47 @@ remove_irrelevant_networks<-function(graph_list){
   return(relevant)
 }
 
+#' Convenience function to either use an existing collectri file or download it from the web via DecouplR.
+#'
+#' @param network. A data table with source and target columns
+#'
+#' @return A data.table with the data table of the subnetwork
+#' @export
+#'
+subsample_and_sparsify_network <- function(network, num_sources, max_out_degree) {
+  if (colnames(network)[1]!='source') BBmisc::stopf('Make sure the first column has title source')
+  if (colnames(network)[2]!='target') BBmisc::stopf('Make sure the second column has title target')
+
+  # Convert to data.table for efficient manipulation
+  network_dt <- as.data.table(network)
+
+  # Get unique source and target nodes
+  all_sources <- unique(network_dt$source)
+  all_targets <- unique(network_dt$target)
+
+  # Check if there are enough sources and targets to sample from
+  if (length(all_sources) < num_sources) {
+    stop("Not enough unique source nodes in the network to sample from.")
+  }
+
+
+  # Randomly select a subset of sources and targets
+  sampled_sources <- sample(all_sources, num_sources, replace = FALSE)
+
+  # Filter the network to keep only the sampled sources and targets
+  subnetwork <- network_dt[source %in% sampled_sources]
+
+  # Sparsify the subnetwork by limiting outgoing connections
+  # We group by the source and keep at most `max_out_degree` connections.
+
+  sparsified_subnetwork <- subnetwork %>%
+    group_by(source) %>%
+    slice_head(n = max_out_degree) %>%
+    ungroup() %>%
+    as.data.table()
+
+  sparsified_subnetwork<-sparsified_subnetwork[!(target %in% sparsified_subnetwork$source)]
+
+  return(sparsified_subnetwork)
+}
 

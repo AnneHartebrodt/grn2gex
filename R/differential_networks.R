@@ -130,6 +130,21 @@ generate_data_from_grn<-function(net, n_cells = 750, seed=11, tree = scMultiSim:
     sub.grn<-sub.grn[, c('target','source', 'grn_effect')]
 
     set.seed(seed)
+    # results <- sim_true_counts(list(
+    #   # required options
+    #   GRN = sub.grn,
+    #   tree = tree, # 1 cluster
+    #   num.cells = n_cells,
+    #   # optional options
+    #   num.cif = 40,
+    #   discrete.cif = T, # one discrete population (Set to true, because otherwise data did not have signal with 1 cluste)
+    #   cif.sigma = 0.25,
+    #   speed.up = T,
+    #   diff.cif.fraction=0.05, #Dial up GRN effect as far as possible
+    #   unregulated.gene.ratio = 0.05, # Dial down number of random genes as far as possible
+    #   do.velocity=FALSE,
+    #   intrinsic.noise = 1.0 # add some noise
+    # ))
     results <- scMultiSim::sim_true_counts(list(
       # required options
       rand.seed = seed,
@@ -141,6 +156,22 @@ generate_data_from_grn<-function(net, n_cells = 750, seed=11, tree = scMultiSim:
       discrete.cif = FALSE, # Setting this to true will produce random data
       cif.sigma = 0.1,
       unregulated.gene.ratio  = 0.05))
+
+    results <- sim_true_counts(list(
+      # required options
+      GRN = sub.grn,
+      tree = tree, # 1 cluster
+      num.cells = n_cells,
+      # optional options
+      num.cif = 40,
+      discrete.cif = T, # one discrete population (Set to true, because otherwise data did not have signal with 1 cluste)
+      cif.sigma = 0.25,
+      speed.up = T,
+      diff.cif.fraction=0.05, #Dial up GRN effect as far as possible
+      unregulated.gene.ratio = 0.05, # Dial down number of random genes as far as possible
+      do.velocity=FALSE,
+      intrinsic.noise = 1.0 # add some noise
+    ))
 
     if (noise){
       scMultiSim::add_expr_noise(
@@ -292,7 +323,7 @@ create_gex_data_easy<-function(net,
   print(net$module)
   number_grns <-length(unique(net$module))
 
-  common_net$effect<-rnorm(nrow(common_net), mean = mean, sd = sd)
+  common_net$effect<-base::rnorm(nrow(common_net), mean = mean, sd = sd)
 
   for (i in unique(net$module)){
     print(i)
