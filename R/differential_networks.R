@@ -323,7 +323,7 @@ create_gex_data_easy<-function(net,
   print(net$module)
   number_grns <-length(unique(net$module))
 
-  common_net$effect<-base::rnorm(nrow(common_net), mean = mean, sd = sd)
+  common_net$effect<-rnorm(nrow(common_net), mean = mean, sd = sd)
 
   for (i in unique(net$module)){
     print(i)

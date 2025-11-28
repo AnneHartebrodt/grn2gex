@@ -72,8 +72,8 @@ loadOrDownloadCollectTRI<-function(collectri_file, organism = 'human'){
   # Main function to cluster collectri network.
   # Check if collectri is stored on disk
   # otherwise download from web
-  options(omnipathr.curl_verbose = TRUE)
-  OmnipathR::omnipath_set_cachedir(tempdir())
+  #options(omnipathr.curl_verbose = TRUE)
+  #OmnipathR::omnipath_set_cachedir(tempdir())
 
   if (!file.exists(collectri_file)){
     # get network
