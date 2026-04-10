@@ -396,6 +396,9 @@ randomly_select_modules<-function(node_labels, n_grns, nr_modules){
 }
 
 
+print_info<-function(){
+	print('This information is void')
+}
 
 #' Title
 #'
