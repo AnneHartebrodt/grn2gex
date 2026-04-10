@@ -264,6 +264,7 @@ test_that("restore_original_directionality returns a named list with 4 elements"
 
   expect_true(is.list(result))
   expect_equal(length(result), 4)
+  # Note: "egdelist" (not "edgelist") is the key name as defined in restore_original_directionality
   expect_true(all(c("subgraph", "clustering", "nodelist", "egdelist") %in% names(result)))
 })
 
@@ -285,5 +286,6 @@ test_that("restore_original_directionality edgelist has source/target columns", 
   undirected_g <- igraph::as.undirected(orig_g)
   result <- restore_original_directionality(undirected_g, orig_g)
 
+  # Note: "egdelist" (not "edgelist") is the key name as defined in restore_original_directionality
   expect_true(all(c("source", "target") %in% colnames(result$egdelist)))
 })
