@@ -113,7 +113,7 @@ set_master_tf_effect<-function(net, disregulated_regulators, tf_effect=5){
 #' @export
 #'
 #' @examples
-generate_data_from_grn<-function(net, n_cells = 750, seed=11, tree = scMultiSim::Phyla1(), noise = FALSE){
+generate_data_from_grn<-function(net, n_cells = 750, seed=11, tree = scMultiSim::Phyla1(), noise = FALSE, alpha_mean=0.1){
 
   if(!('source' %in% colnames(net))) BBmisc::stopf("Column 'source' does not exist in dataframe")
   if(!('target' %in% colnames(net))) BBmisc::stopf("Column 'target' does not exist in dataframe")
@@ -176,11 +176,11 @@ generate_data_from_grn<-function(net, n_cells = 750, seed=11, tree = scMultiSim:
     if (noise){
       scMultiSim::add_expr_noise(
         results,
-        # options go here
-        alpha_mean = 1e4
+        protocol = 'UMI',
+        alpha_mean=alpha_mean
       )
     }
-    counts<-results$counts
+    counts<-results$counts_obs$counts
     # remove additional genes, to avoid spurious clustering
     counts<-counts[sapply(rownames(counts), function(x) !startsWith(x, 'gene')),]
     meta<-results$cell_meta
