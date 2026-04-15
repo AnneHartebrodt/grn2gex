@@ -18,7 +18,7 @@ save_generated_data<-function(net, counts, meta, gex_dir, disregulated_info=NULL
   dir.create(gex.plot, recursive = TRUE)
 
   # save plots before transforming data into data.table
-  save_plots(counts, meta, gex.plot)
+  #save_plots(counts, meta, gex.plot)
 
   # save counts and metadata
   gene_names<-rownames(counts)

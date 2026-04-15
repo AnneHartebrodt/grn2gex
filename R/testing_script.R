@@ -1,13 +1,13 @@
-# require(grn2gex)
+# # require(grn2gex)
 # require(scMultiSim)
-# require(data.table)
-#
-# library(ComplexHeatmap)
-# library(circlize)
-#
-# # # #
-# # # # require(yaml) # ty = yaml.load_file('/home/bionets-og86asub/Documents/netmap/thenetmap/dockerize-grn2gex/config.yaml')
+# # require(data.table)
 # #
+# # library(ComplexHeatmap)
+# # library(circlize)
+# #
+# # # # #
+# # # # # require(yaml) # ty = yaml.load_file('/home/bionets-og86asub/Documents/netmap/thenetmap/dockerize-grn2gex/config.yaml')
+# # #
 # net.dir<-'/home/bionets-og86asub/Documents/netmap/thenetmap//NetMap_LRP/data/simulation/collectri_subnetworks_2'
 # collectri.file <-'/home/bionets-og86asub/Documents/netmap/thenetmap/NetMap_LRP/data/collectri.tsv'
 # gex.dir<-'/home/bionets-og86asub/Documents/netmap/thenetmap/NetMap_LRP/data/simulation/collectri_simulated_data2'
@@ -19,7 +19,7 @@
 # disregulation.type <- 'adjust-weight-of-others'
 # seed <- 11 #
 #
-# collectri <- loadOrDownloadCollectTRI(collectri.file)
+# collectri <- loadOrDownloadCollectTRI(collectri_file = collectri.file)
 # colnames(collectri)<- c('source', 'target', 'sad')
 # graph_list<-clusterNetwork(collectri, min_nodes = 200, max_nodes = 500 )
 #
@@ -33,14 +33,17 @@
 # res2<-restore_original_directionality(graph_list[[11]], orig_graph)
 # res3<-restore_original_directionality(graph_list[[5]], orig_graph)
 # res4<-restore_original_directionality(graph_list[[2]], orig_graph)
+# res6<-restore_original_directionality(graph_list[[8]], orig_graph)
+# res7<-restore_original_directionality(graph_list[[10]], orig_graph)
+# res8<-restore_original_directionality(graph_list[[9]], orig_graph)
 # res5<-restore_original_directionality(graph_list[[3]], orig_graph)
 #
-# el1 <- rbind(res$egdelist, res2$egdelist, res3$egdelist, res4$egdelist)
+# el1 <- rbind(res$egdelist, res2$egdelist, res3$egdelist, res4$egdelist, res6$egdelist, res7$egdelist, res8$egdelist)
 # ll <- nrow(res$egdelist)
 # ll2 <- nrow(res2$egdelist)
 # ll3<- nrow(res3$egdelist)
 # ll4<- nrow(res4$egdelist)
-# el1$module<-c(rep(1, ll), rep(2, ll2), rep(3, ll3), rep(4, ll4))
+# el1$module<-c(rep(1, ll), rep(2, ll2), rep(3, ll3), rep(4, ll4), rep(5, nrow(res6$egdelist)),rep(6, nrow(res7$egdelist)),rep(7, nrow(res8$egdelist)) )
 #
 #
 # dataset<-create_gex_data_easy(el1, res5$egdelist, 'test', base_effect = 'standard-normal', mean = 4, sd=1)
@@ -56,11 +59,11 @@
 # scMultiSim::plot_gene_module_cor_heatmap(dataset$counts)
 #
 # plot(res$clustering, gg , vertex.size = 5, edge.arrow.size = 1, vertex.label.cex = 1)
-#
-#
-# ha = ComplexHeatmap::HeatmapAnnotation(
-#   annotation_name_side = "left"
-# )
+# #
+# #
+# # ha = ComplexHeatmap::HeatmapAnnotation(
+# #   annotation_name_side = "left"
+# # )
 #
 #
 # plot(ComplexHeatmap::Heatmap(dataset$counts, row_names_gp =grid::gpar(fontsize = 5),

@@ -21,7 +21,6 @@ save_plots<-function(counts, meta, directory){
     ggplot2::xlab('tSNE1')+
     ggplot2::scale_color_manual(values = colors)
 
-  pgrn
 
   ggplot2::ggsave(pgrn, file = file.path(directory, 'tsne_plot.pdf'), height = 15, width = 15, unit = 'cm')
 

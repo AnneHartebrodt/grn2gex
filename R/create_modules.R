@@ -202,9 +202,9 @@ subsample_and_sparsify_network <- function(network, num_sources, max_out_degree)
   # We group by the source and keep at most `max_out_degree` connections.
 
   sparsified_subnetwork <- subnetwork %>%
-    group_by(source) %>%
-    slice_head(n = max_out_degree) %>%
-    ungroup() %>%
+    dplyr::group_by(source) %>%
+    dplyr::slice_head(n = max_out_degree) %>%
+    dplyr::ungroup() %>%
     as.data.table()
 
   sparsified_subnetwork<-sparsified_subnetwork[!(target %in% sparsified_subnetwork$source)]
