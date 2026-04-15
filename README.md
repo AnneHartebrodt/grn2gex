@@ -2,6 +2,7 @@
 # grn2gex
 
 <!-- badges: start -->
+[![Codecov test coverage](https://codecov.io/gh/AnneHartebrodt/grn2gex/graph/badge.svg)](https://app.codecov.io/gh/AnneHartebrodt/grn2gex)
 <!-- badges: end -->
 
 grn2gex can be used to simulate gene expression data from differential gene regulatory networks
