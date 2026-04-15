@@ -41,11 +41,11 @@ test_that("save_generated_data creates the output directory", {
   # save_plots temporarily
   local_mocked_bindings(
     save_plots = function(...) invisible(NULL),
-    .package   = "grn2gex",
-    {
-      save_generated_data(net, counts, meta, tmp)
-    }
+    .package = "grn2gex"
   )
+
+  # This code now runs with the mock active automatically
+  save_generated_data(net, counts, meta, tmp)
   expect_true(dir.exists(tmp))
 })
 
@@ -60,11 +60,12 @@ test_that("save_generated_data writes gex.tsv", {
 
   local_mocked_bindings(
     save_plots = function(...) invisible(NULL),
-    .package   = "grn2gex",
-    {
-      save_generated_data(net, counts, meta, tmp)
-    }
+    .package = "grn2gex"
   )
+
+  # This code now runs with the mock active automatically
+  save_generated_data(net, counts, meta, tmp)
+
   expect_true(file.exists(file.path(tmp, "gex.tsv")))
 })
 
@@ -79,11 +80,12 @@ test_that("save_generated_data writes metadata.tsv", {
 
   local_mocked_bindings(
     save_plots = function(...) invisible(NULL),
-    .package   = "grn2gex",
-    {
-      save_generated_data(net, counts, meta, tmp)
-    }
+    .package = "grn2gex"
   )
+
+  # This code now runs with the mock active automatically
+  save_generated_data(net, counts, meta, tmp)
+
   expect_true(file.exists(file.path(tmp, "metadata.tsv")))
 })
 
@@ -98,11 +100,12 @@ test_that("save_generated_data writes net.tsv", {
 
   local_mocked_bindings(
     save_plots = function(...) invisible(NULL),
-    .package   = "grn2gex",
-    {
-      save_generated_data(net, counts, meta, tmp)
-    }
+    .package = "grn2gex"
   )
+
+  # This code now runs with the mock active automatically
+  save_generated_data(net, counts, meta, tmp)
+
   expect_true(file.exists(file.path(tmp, "net.tsv")))
 })
 
@@ -120,11 +123,11 @@ test_that("save_generated_data writes disregulation_info.tsv when provided", {
 
   local_mocked_bindings(
     save_plots = function(...) invisible(NULL),
-    .package   = "grn2gex",
-    {
-      save_generated_data(net, counts, meta, tmp, disregulated_info = disreg)
-    }
+    .package = "grn2gex"
   )
+
+  # This code now runs with the mock active automatically
+  save_generated_data(net, counts, meta, tmp, disreg)
   expect_true(file.exists(file.path(tmp, "disregulation_info.tsv")))
 })
 
@@ -139,11 +142,11 @@ test_that("save_generated_data does NOT write disregulation_info.tsv when not pr
 
   local_mocked_bindings(
     save_plots = function(...) invisible(NULL),
-    .package   = "grn2gex",
-    {
-      save_generated_data(net, counts, meta, tmp)
-    }
+    .package = "grn2gex"
   )
+
+  # This code now runs with the mock active automatically
+  save_generated_data(net, counts, meta, tmp)
   expect_false(file.exists(file.path(tmp, "disregulation_info.tsv")))
 })
 
@@ -156,13 +159,13 @@ test_that("save_generated_data returns the output directory path", {
   counts <- make_counts()
   meta   <- make_meta()
 
-  result <- local_mocked_bindings(
+  local_mocked_bindings(
     save_plots = function(...) invisible(NULL),
-    .package   = "grn2gex",
-    {
-      save_generated_data(net, counts, meta, tmp)
-    }
+    .package = "grn2gex"
   )
+
+  # This code now runs with the mock active automatically
+  result <- save_generated_data(net, counts, meta, tmp)
   expect_equal(result, tmp)
 })
 
@@ -178,11 +181,12 @@ test_that("save_generated_data gex.tsv has correct number of columns", {
 
   local_mocked_bindings(
     save_plots = function(...) invisible(NULL),
-    .package   = "grn2gex",
-    {
-      save_generated_data(net, counts, meta, tmp)
-    }
+    .package = "grn2gex"
   )
+
+  # This code now runs with the mock active automatically
+  save_generated_data(net, counts, meta, tmp)
+
   gex <- data.table::fread(file.path(tmp, "gex.tsv"), sep = "\t")
   # Rows = cells, columns = genes
   expect_equal(ncol(gex), n_genes)
@@ -202,7 +206,7 @@ make_test_orig_graph <- function() {
 }
 
 make_test_subgraph <- function(orig) {
-  igraph::as.undirected(orig)
+  igraph::as_undirected(orig)
 }
 
 test_that("save_small_subgraph creates a subdirectory inside network_dir", {
