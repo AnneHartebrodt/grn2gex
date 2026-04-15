@@ -3,6 +3,9 @@
 #'
 #' @param net The network as an edge list
 #' @param disregulated_regulators The data table containing the perturbation information
+#' @param mean Mean of the gaussian
+#' @param sd Standard deviation of the gaussian
+#'
 #'
 #' @return The network with an additional column base_effect containing the base weights
 #' @export
@@ -108,6 +111,7 @@ set_master_tf_effect<-function(net, disregulated_regulators, tf_effect=5){
 #' @param seed Random seed
 #' @param tree Differentiation tree required for scMultisim (please refer to documentation)
 #' @param noise Whether to add typical noise to the count data
+#' @param alpha_mean: sampling rate passed to add_noise
 #'
 #' @return List of two elements: count matrix, and associated metadata as a data.table
 #' @export
